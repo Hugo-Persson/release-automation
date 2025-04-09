@@ -18,7 +18,7 @@ if [[ "$1" == "--info" ]]; then
 fi
 
 cd "$(dirname "$(realpath "$0")")" || exit
-./go-root.sh
+source ./go-root.sh
 pwd
 set -e
 

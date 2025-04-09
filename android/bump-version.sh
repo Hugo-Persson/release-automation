@@ -18,6 +18,8 @@ if [[ "$1" == "--info" ]]; then
 	exit 0
 fi
 
+cd "$(dirname "$(realpath "$0")")" || exit
+source ./go-root.sh
 FILE="./app/build.gradle.kts"
 # Extract the current values using grep
 

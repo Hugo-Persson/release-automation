@@ -56,7 +56,7 @@ preform_release() {
 	git cliff $CLIFF_ARGS --tag "$VERSION" -o CHANGELOG.md
 	git add CHANGELOG.md
 
-	if is_slam; then
+	if $IS_SLAM; then
 		SLAM_SDK_VERSION=$(sed -n 's/.*var slamSDKVersion = "\([^"]*\)".*/\1/p' "$FILE")
 		git commit -m "chore(publishing): $VERSION - SlamSDK = $SLAM_SDK_VERSION"
 		git tag -a "v$VERSION" -m "Release version v$VERSION"
