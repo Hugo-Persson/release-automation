@@ -21,7 +21,7 @@ fi
 
 cd "$(dirname "$(realpath "$0")")" || exit
 IS_SLAM=$(./is-slam.sh)
-./go-root.sh
+source ./go-root.sh
 
 if [[ -n "$(sed -n '/useLocalSDK=true/p' slam.properties)" ]]; then
 	# If useLocalSDK is true, execute the block of code
