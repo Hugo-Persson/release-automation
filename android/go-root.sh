@@ -15,8 +15,10 @@ if [[ "$1" == "--info" ]]; then
 	echo "Note: This script is typically sourced by other scripts to ensure they run from the project root"
 	exit 0
 fi
-
-cd "$(dirname "$(realpath "$0")")" || exit
+# Check if go-root.sh exists in the current directory
+if [[ ! -f "$(pwd)/go-root.sh" ]]; then
+	cd "$(dirname "$(realpath "$0")")" || exit
+fi
 while [[ ! -d "gradle" && "$(pwd)" != "/" ]]; do
 	cd ..
 done
