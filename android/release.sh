@@ -20,6 +20,7 @@ if [[ "$1" == "--info" ]]; then
 fi
 
 cd "$(dirname "$(realpath "$0")")" || exit
+SCRIPT_DIR="$(pwd)"
 IS_SLAM=$(./is-slam.sh)
 source ./go-root.sh
 
@@ -74,7 +75,8 @@ preform_release() {
 		--align center --width 50 --margin "1 2" --padding "2 4" \
 		"v$VERSION" 'Release is complete!'
 	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/demo-app-$VERSION.apk"
-	./scripts/bump-version.sh
+	cd $SCRIPT_DIR || exit
+	./bump-version.sh
 
 }
 gum confirm "Do you want to preform release?" && preform_release
