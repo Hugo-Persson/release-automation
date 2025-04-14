@@ -41,19 +41,18 @@ gum log --structured --level debug "Building project"
 if ! ./gradlew build; then
 	gum log --level error "The build failed with a non-zero exit code."
 	exit 1
-else
-	gum log --level info "The build succeeded."
 fi
+
+if git remote -v | grep -q "indoorsurvey\.git"; then
+	source "$SCRIPT_DIR/get-indoor-survey-version.sh"
+else
+	VERSION_NAME=$(grep 'versionName = ' $FILE | awk -F '"' '{print $2}')
+fi
+gum log --level info "The build succeeded." --version "$VERSION_NAME"
 
 preform_release() {
 
 	FILE="./app/build.gradle.kts"
-
-	if git remote -v | grep -q "indoorsurvey\.git"; then
-		source "$SCRIPT_DIR/get-indoor-survey-version.sh"
-	else
-		VERSION_NAME=$(grep 'versionName = ' $FILE | awk -F '"' '{print $2}')
-	fi
 
 	gum log --structured --level debug "Compiling and publishing"
 
