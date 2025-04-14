@@ -80,14 +80,13 @@ preform_release() {
 		--align center --width 50 --margin "1 2" --padding "2 4" \
 		"v$VERSION_NAME" 'Release is complete!'
 	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/demo-app-$VERSION_NAME.apk"
-	cd "$SCRIPT_DIR" || exit
 	# Check if git remote ends with indoorsurvey.git
 	if git remote -v | grep -q "indoorsurvey\.git"; then
 		gum log --structured --level debug "Detected indoorsurvey repository, running bump-indoor-survey.sh"
-		./bump-indoor-survey.sh
+		"$SCRIPT_DIR/bump-indoor-survey.sh"
 	else
 		gum log --structured --level debug "Running standard version bump"
-		./bump-version.sh
+		"$SCRIPT_DIR/bump-version.sh"
 	fi
 
 }
