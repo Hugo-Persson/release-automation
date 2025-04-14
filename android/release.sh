@@ -49,20 +49,24 @@ preform_release() {
 
 	FILE="./app/build.gradle.kts"
 
-	VERSION=$(grep 'versionName = ' $FILE | awk -F '"' '{print $2}')
+	if git remote -v | grep -q "indoorsurvey\.git"; then
+		source "$SCRIPT_DIR/get-indoor-survey-version.sh"
+	else
+		VERSION_NAME=$(grep 'versionName = ' $FILE | awk -F '"' '{print $2}')
+	fi
 
 	gum log --structured --level debug "Compiling and publishing"
 
-	git cliff $CLIFF_ARGS --tag "$VERSION" -o CHANGELOG.md
+	git cliff $CLIFF_ARGS --tag "$VERSION_NAME" -o CHANGELOG.md
 	git add CHANGELOG.md
 
 	if $IS_SLAM; then
 		SLAM_SDK_VERSION=$(sed -n 's/.*var slamSDKVersion = "\([^"]*\)".*/\1/p' "$FILE")
-		git commit -m "chore(publishing): $VERSION - SlamSDK = $SLAM_SDK_VERSION"
-		git tag -a "v$VERSION" -m "Release version v$VERSION"
+		git commit -m "chore(publishing): $VERSION_NAME - SlamSDK = $SLAM_SDK_VERSION"
+		git tag -a "v$VERSION_NAME" -m "Release version v$VERSION_NAME"
 	else
-		git commit -m "chore(publishing): $VERSION"
-		git tag -a "v$VERSION" -m "Release version v$VERSION"
+		git commit -m "chore(publishing): $VERSION_NAME"
+		git tag -a "v$VERSION_NAME" -m "Release version v$VERSION_NAME"
 	fi
 
 	git push origin --tags
@@ -75,8 +79,8 @@ preform_release() {
 	gum style \
 		--foreground 212 --border-foreground 212 --border double \
 		--align center --width 50 --margin "1 2" --padding "2 4" \
-		"v$VERSION" 'Release is complete!'
-	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/demo-app-$VERSION.apk"
+		"v$VERSION_NAME" 'Release is complete!'
+	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/demo-app-$VERSION_NAME.apk"
 	cd "$SCRIPT_DIR" || exit
 	# Check if git remote ends with indoorsurvey.git
 	if git remote -v | grep -q "indoorsurvey\.git"; then
