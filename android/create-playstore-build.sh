@@ -22,13 +22,19 @@ fi
 cd "$(dirname "$(realpath "$0")")" || exit
 source ./go-root.sh
 set -e
-echo "HERE"
+# Check for uncommitted changes
+if [[ -n "$(git status --porcelain)" ]]; then
+	gum log --structured --level error "Uncommitted changes found in repository. Please commit or stash them before releasing."
+	git status
+	exit 1
+fi
 
 # Save the current branch name
 ORIGINAL_BRANCH=$(git branch --show-current)
 
 # This will run even if the script exits with an error or is interrupted
 cleanup() {
+	./release-automation/android/post-release.sh
 	echo "Switching back to original branch: $ORIGINAL_BRANCH"
 	git switch "$ORIGINAL_BRANCH" 2>/dev/null || true
 }
@@ -72,6 +78,8 @@ fi
 # Checkout to the selected tag
 echo "Checking out to tag: $selected_tag"
 git checkout "$selected_tag"
+
+./release-automation/android/pre-release.sh
 
 gum log --structured --level debug "Compiling"
 

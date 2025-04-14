@@ -68,22 +68,24 @@ preform_release() {
 	git push origin --tags
 	git push
 
+	./release-automation/android/pre-release.sh
 	./gradlew assembleRelease
+	./release-automation/android/post-release.sh
 
 	gum style \
 		--foreground 212 --border-foreground 212 --border double \
 		--align center --width 50 --margin "1 2" --padding "2 4" \
 		"v$VERSION" 'Release is complete!'
 	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/demo-app-$VERSION.apk"
-	cd $SCRIPT_DIR || exit
-	 # Check if git remote ends with indoorsurvey.git
-    if git remote -v | grep -q "indoorsurvey\.git"; then
-        gum log --structured --level debug "Detected indoorsurvey repository, running bump-indoor-survey.sh"
-        ./bump-indoor-survey.sh
-    else
-        gum log --structured --level debug "Running standard version bump"
-        ./bump-version.sh
-    fi
+	cd "$SCRIPT_DIR" || exit
+	# Check if git remote ends with indoorsurvey.git
+	if git remote -v | grep -q "indoorsurvey\.git"; then
+		gum log --structured --level debug "Detected indoorsurvey repository, running bump-indoor-survey.sh"
+		./bump-indoor-survey.sh
+	else
+		gum log --structured --level debug "Running standard version bump"
+		./bump-version.sh
+	fi
 
 }
 gum confirm "Do you want to preform release?" && preform_release
