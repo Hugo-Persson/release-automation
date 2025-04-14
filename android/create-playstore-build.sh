@@ -85,7 +85,8 @@ gum log --structured --level debug "Compiling"
 
 OUTPUT_FILE="app/build/outputs/bundle/release/app-release.aab"
 
-DOWNLOADS_OUTPUT_NAME="demo-app-play-store-release.aab"
+APP_NAME=$(basename "$(pwd)")
+DOWNLOADS_OUTPUT_NAME="$APP_NAME-play-store-release.aab"
 ./gradlew bundleRelease
 
 gum style \
