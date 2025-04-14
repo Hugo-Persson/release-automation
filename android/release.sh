@@ -48,7 +48,7 @@ if git remote -v | grep -q "indoorsurvey\.git"; then
 else
 	VERSION_NAME=$(grep 'versionName = ' $FILE | awk -F '"' '{print $2}')
 fi
-gum log --level info "The build succeeded." --version "$VERSION_NAME"
+gum log --level info "The build succeeded." version "$VERSION_NAME"
 
 preform_release() {
 
