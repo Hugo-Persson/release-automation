@@ -43,11 +43,7 @@ if ! ./gradlew build; then
 	exit 1
 fi
 
-if git remote -v | grep -q "indoorsurvey\.git"; then
-	source "$SCRIPT_DIR/get-indoor-survey-version.sh"
-else
-	VERSION_NAME=$(grep 'versionName = ' $FILE | awk -F '"' '{print $2}')
-fi
+VERSION_NAME=$(grep 'versionName = ' "$FILE" | awk -F '"' '{print $2}')
 gum log --level info "The build succeeded." version "$VERSION_NAME"
 
 preform_release() {
@@ -73,6 +69,7 @@ preform_release() {
 
 	./release-automation/android/pre-release.sh
 	./gradlew assembleRelease
+	./release-automation/android/post-release.sh
 
 	gum style \
 		--foreground 212 --border-foreground 212 --border double \
@@ -81,15 +78,8 @@ preform_release() {
 
 	APP_NAME=$(basename "$(pwd)")
 	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/$APP_NAME-$VERSION_NAME.apk"
-	# Check if git remote ends with indoorsurvey.git
-	if git remote -v | grep -q "indoorsurvey\.git"; then
-		gum log --structured --level debug "Detected indoorsurvey repository, running bump-indoor-survey.sh"
-		"$SCRIPT_DIR/bump-indoor-survey.sh"
-	else
-		gum log --structured --level debug "Running standard version bump"
-		"$SCRIPT_DIR/bump-version.sh"
-	fi
-	./release-automation/android/post-release.sh
+	gum log --structured --level debug "Running standard version bump"
+	"$SCRIPT_DIR/bump-version.sh"
 
 }
 gum confirm "Do you want to preform release?" && preform_release
