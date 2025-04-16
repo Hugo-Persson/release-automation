@@ -73,7 +73,6 @@ preform_release() {
 
 	./release-automation/android/pre-release.sh
 	./gradlew assembleRelease
-	./release-automation/android/post-release.sh
 
 	gum style \
 		--foreground 212 --border-foreground 212 --border double \
@@ -90,6 +89,7 @@ preform_release() {
 		gum log --structured --level debug "Running standard version bump"
 		"$SCRIPT_DIR/bump-version.sh"
 	fi
+	./release-automation/android/post-release.sh
 
 }
 gum confirm "Do you want to preform release?" && preform_release
