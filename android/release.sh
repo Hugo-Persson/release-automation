@@ -43,12 +43,11 @@ if ! ./gradlew build; then
 	exit 1
 fi
 
+FILE="./app/build.gradle.kts"
 VERSION_NAME=$(grep 'versionName = ' "$FILE" | awk -F '"' '{print $2}')
 gum log --level info "The build succeeded." version "$VERSION_NAME"
 
 preform_release() {
-
-	FILE="./app/build.gradle.kts"
 
 	gum log --structured --level debug "Compiling and publishing"
 
