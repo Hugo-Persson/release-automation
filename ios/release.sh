@@ -3,6 +3,7 @@ set -e
 
 # Navigate to project root
 cd "$(dirname "$0")"
+source ./go-root.sh
 
 # Check if the working directory is clean
 if [ -n "$(git status --porcelain)" ]; then
