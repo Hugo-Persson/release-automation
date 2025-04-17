@@ -41,49 +41,44 @@ gum log --structured --level debug "Building project"
 if ! ./gradlew build; then
 	gum log --level error "The build failed with a non-zero exit code."
 	exit 1
-else
-	gum log --level info "The build succeeded."
 fi
+
+FILE="./app/build.gradle.kts"
+VERSION_NAME=$(grep 'versionName = ' "$FILE" | awk -F '"' '{print $2}')
+gum log --level info "The build succeeded." version "$VERSION_NAME"
 
 preform_release() {
 
-	FILE="./app/build.gradle.kts"
-
-	VERSION=$(grep 'versionName = ' $FILE | awk -F '"' '{print $2}')
-
 	gum log --structured --level debug "Compiling and publishing"
 
-	git cliff $CLIFF_ARGS --tag "$VERSION" -o CHANGELOG.md
+	git cliff $CLIFF_ARGS --tag "$VERSION_NAME" -o CHANGELOG.md
 	git add CHANGELOG.md
 
 	if $IS_SLAM; then
 		SLAM_SDK_VERSION=$(sed -n 's/.*var slamSDKVersion = "\([^"]*\)".*/\1/p' "$FILE")
-		git commit -m "chore(publishing): $VERSION - SlamSDK = $SLAM_SDK_VERSION"
-		git tag -a "v$VERSION" -m "Release version v$VERSION"
+		git commit -m "chore(publishing): $VERSION_NAME - SlamSDK = $SLAM_SDK_VERSION"
+		git tag -a "v$VERSION_NAME" -m "Release version v$VERSION_NAME"
 	else
-		git commit -m "chore(publishing): $VERSION"
-		git tag -a "v$VERSION" -m "Release version v$VERSION"
+		git commit -m "chore(publishing): $VERSION_NAME"
+		git tag -a "v$VERSION_NAME" -m "Release version v$VERSION_NAME"
 	fi
 
 	git push origin --tags
 	git push
 
+	./release-automation/android/pre-release.sh
 	./gradlew assembleRelease
+	./release-automation/android/post-release.sh
 
 	gum style \
 		--foreground 212 --border-foreground 212 --border double \
 		--align center --width 50 --margin "1 2" --padding "2 4" \
-		"v$VERSION" 'Release is complete!'
-	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/demo-app-$VERSION.apk"
-	cd $SCRIPT_DIR || exit
-	 # Check if git remote ends with indoorsurvey.git
-    if git remote -v | grep -q "indoorsurvey\.git"; then
-        gum log --structured --level debug "Detected indoorsurvey repository, running bump-indoor-survey.sh"
-        ./bump-indoor-survey.sh
-    else
-        gum log --structured --level debug "Running standard version bump"
-        ./bump-version.sh
-    fi
+		"v$VERSION_NAME" 'Release is complete!'
+
+	APP_NAME=$(basename "$(pwd)")
+	gum confirm "Do you want to copy to Downloads?" && cp app/build/outputs/apk/release/app-release.apk "$HOME/Downloads/$APP_NAME-$VERSION_NAME.apk"
+	gum log --structured --level debug "Running standard version bump"
+	"$SCRIPT_DIR/bump-version.sh"
 
 }
 gum confirm "Do you want to preform release?" && preform_release
