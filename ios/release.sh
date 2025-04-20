@@ -56,7 +56,7 @@ git commit -m "chore(bump) Version to $NEW_VERSION ($NEW_BUILD)"
 # Archive and upload to TestFlight
 echo "Archiving and uploading to TestFlight..."
 xcodebuild -scheme "$XCODE_SCHEMA" -configuration Release archive -archivePath "$ARCHIVE_PATH"
-sentry-cli debug-files upload --include-sources "$ARCHIVE_PATH"
+sentry-cli debug-files upload --include-sources "$ARCHIVE_PATH/dSYMs/"
 
 open build/*.xcarchive
 
