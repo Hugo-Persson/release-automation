@@ -4,6 +4,7 @@ set -e
 # Navigate to project root
 cd "$(dirname "$0")"
 source ./go-root.sh
+source .env
 
 # Check if the working directory is clean
 if [ -n "$(git status --porcelain)" ]; then
@@ -54,8 +55,8 @@ git commit -m "chore(bump) Version to $NEW_VERSION ($NEW_BUILD)"
 
 # Archive and upload to TestFlight
 echo "Archiving and uploading to TestFlight..."
-# TODO: Get scheme from ENV
-xcodebuild -scheme karoliner -configuration Release archive -archivePath build/karoliner.xcarchive
+xcodebuild -scheme "$XCODE_SCHEMA" -configuration Release archive -archivePath "$ARCHIVE_PATH"
+sentry-cli debug-files upload --include-sources "$ARCHIVE_PATH"
 
 open build/*.xcarchive
 
