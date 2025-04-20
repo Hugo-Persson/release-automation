@@ -50,7 +50,7 @@ fi
 
 # Commit the version changes
 git add $CONFIG_PATH
-git commit -m "Bump version to $NEW_VERSION ($NEW_BUILD)"
+git commit -m "chore(bump) Version to $NEW_VERSION ($NEW_BUILD)"
 
 # Archive and upload to TestFlight
 echo "Archiving and uploading to TestFlight..."
